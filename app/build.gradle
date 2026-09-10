@@ -19,10 +19,14 @@ android {
             applicationIdSuffix '.debug'
             versionNameSuffix '-debug'
         }
+
         release {
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles(
+                getDefaultProguardFile('proguard-android-optimize.txt'),
+                'proguard-rules.pro'
+            )
         }
     }
 
@@ -33,11 +37,14 @@ android {
 
     packaging {
         resources {
-            excludes += ['/META-INF/{AL2.0,LGPL2.1}', '/META-INF/DEPENDENCIES']
+            excludes += [
+                '/META-INF/{AL2.0,LGPL2.1}',
+                '/META-INF/DEPENDENCIES'
+            ]
         }
     }
 }
 
 dependencies {
-    implementation 'org.mozilla.geckoview:geckoview-stable:140.15.0esr'
+    implementation 'org.mozilla.geckoview:geckoview-stable:157.0.20260909211052'
 }
