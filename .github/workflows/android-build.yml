@@ -2,7 +2,7 @@ name: Orbita Aurora Android Build
 
 on:
   push:
-    branches: [ "**" ]
+    branches: ["**"]
   pull_request:
   workflow_dispatch:
 
@@ -27,83 +27,151 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
           cache: gradle
 
       - name: Set up Gradle 9.6.0
         uses: gradle/actions/setup-gradle@v6
         with:
-          gradle-version: '9.6.0'
+          gradle-version: "9.6.0"
           cache-provider: basic
 
       - name: Verify build environment
         run: |
           set -euo pipefail
+
+          echo "=== Java ==="
           java -version
+
+          echo "=== Gradle ==="
           gradle --version
+
+          echo "=== Build configuration ==="
           echo "Android Gradle Plugin: 9.4.0"
-          echo "GeckoView: 156.0.20260823094236"
+          echo "GeckoView: org.mozilla.geckoview:geckoview:155.0.20260903215306"
 
       - name: Build debug APK and capture build log
         id: gradle-build
         shell: bash
         run: |
           set -o pipefail
+
+          rm -rf ci-error
           rm -f build-output.log
-          gradle --no-daemon --console=plain --stacktrace --warning-mode=all :app:assembleDebug 2>&1 | tee build-output.log
+
+          echo "Starting Gradle build..."
+
+          gradle \
+            --no-daemon \
+            --console=plain \
+            --stacktrace \
+            --warning-mode=all \
+            :app:assembleDebug \
+            2>&1 | tee build-output.log
+
+          BUILD_EXIT_CODE=${PIPESTATUS[0]}
+
+          echo "Gradle exit code: ${BUILD_EXIT_CODE}"
+
+          exit "${BUILD_EXIT_CODE}"
 
       - name: Upload debug APK
-        if: success()
+        if: ${{ steps.gradle-build.outcome == 'success' }}
         uses: actions/upload-artifact@v4
         with:
           name: orbita-aurora-debug-apk-${{ github.run_number }}
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 14
+          compression-level: 6
 
       - name: Extract focused error log
-        if: failure()
+        if: ${{ always() && steps.gradle-build.outcome == 'failure' }}
         shell: bash
         run: |
-          set +e
+          set -euo pipefail
+
           mkdir -p ci-error
-          python3 scripts/extract-ci-errors.py build-output.log ci-error/error-log.txt
+
+          if [ -f build-output.log ]; then
+            python3 scripts/extract-ci-errors.py \
+              build-output.log \
+              ci-error/error-log.txt
+          else
+            printf '%s\n' \
+              "Gradle build failed but build-output.log was not created." \
+              "Check the Build debug APK and capture build log step output." \
+              > ci-error/error-log.txt
+          fi
+
           {
             echo "# Orbita Aurora CI Error Report"
             echo
-            echo "Workflow: $GITHUB_WORKFLOW"
-            echo "Run: $GITHUB_RUN_NUMBER"
-            echo "Commit: $GITHUB_SHA"
-            echo "Ref: $GITHUB_REF"
-            echo "Runner: $RUNNER_OS"
+            echo "Workflow: ${GITHUB_WORKFLOW}"
+            echo "Run: ${GITHUB_RUN_NUMBER}"
+            echo "Commit: ${GITHUB_SHA}"
+            echo "Ref: ${GITHUB_REF}"
+            echo "Runner: ${RUNNER_OS}"
+            echo
+            echo "## Failed step"
+            echo
+            echo "\`gradle-build\`"
             echo
             echo "## Focused build error"
-            echo
-            cat ci-error/error-log.txt
-          } > ci-error/ERROR_REPORT.md
-
-          # Keep the full raw log out of the downloadable error artifact.
-          rm -f build-output.log
-
-      - name: Add focused error to Job Summary
-        if: failure()
-        shell: bash
-        run: |
-          {
-            echo "## ❌ Orbita Aurora build failed"
-            echo
-            echo "The downloadable **orbita-aurora-error-log-${{ github.run_number }}** artifact contains the filtered error/root-cause context."
             echo
             echo '```text'
             cat ci-error/error-log.txt
             echo '```'
+          } > ci-error/ERROR_REPORT.md
+
+          # Do not upload the large raw Gradle log.
+          rm -f build-output.log
+
+          echo "Focused CI error report created:"
+          find ci-error -maxdepth 1 -type f -print
+
+      - name: Add focused error to Job Summary
+        if: ${{ always() && steps.gradle-build.outcome == 'failure' }}
+        shell: bash
+        run: |
+          {
+            echo "## ❌ Orbita Aurora Android build failed"
+            echo
+            echo "**Run:** ${{ github.run_number }}"
+            echo
+            echo "A focused error report will be uploaded as a downloadable artifact."
+            echo
+            echo "### Root-cause context"
+            echo
+            echo '```text'
+
+            if [ -f ci-error/error-log.txt ]; then
+              cat ci-error/error-log.txt
+            else
+              echo "Focused error log was not generated."
+              echo "Check the failed Gradle build step output."
+            fi
+
+            echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload focused error log
-        if: failure()
+        if: ${{ always() && steps.gradle-build.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: orbita-aurora-error-log-${{ github.run_number }}
-          path: ci-error/
+          path: |
+            ci-error/error-log.txt
+            ci-error/ERROR_REPORT.md
           if-no-files-found: error
           retention-days: 14
+          compression-level: 6
+          overwrite: true
+
+      - name: Fail workflow after error report upload
+        if: ${{ always() && steps.gradle-build.outcome == 'failure' }}
+        shell: bash
+        run: |
+          echo "Gradle build failed."
+          echo "Focused error report has been generated and uploaded."
+          exit 1
