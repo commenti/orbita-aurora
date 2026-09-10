@@ -1,0 +1,109 @@
+name: Orbita Aurora Android Build
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Set up Gradle 9.6.0
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '9.6.0'
+          cache-provider: basic
+
+      - name: Verify build environment
+        run: |
+          set -euo pipefail
+          java -version
+          gradle --version
+          echo "Android Gradle Plugin: 9.4.0"
+          echo "GeckoView: 156.0.20260823094236"
+
+      - name: Build debug APK and capture build log
+        id: gradle-build
+        shell: bash
+        run: |
+          set -o pipefail
+          rm -f build-output.log
+          gradle --no-daemon --console=plain --stacktrace --warning-mode=all :app:assembleDebug 2>&1 | tee build-output.log
+
+      - name: Upload debug APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbita-aurora-debug-apk-${{ github.run_number }}
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Extract focused error log
+        if: failure()
+        shell: bash
+        run: |
+          set +e
+          mkdir -p ci-error
+          python3 scripts/extract-ci-errors.py build-output.log ci-error/error-log.txt
+          {
+            echo "# Orbita Aurora CI Error Report"
+            echo
+            echo "Workflow: $GITHUB_WORKFLOW"
+            echo "Run: $GITHUB_RUN_NUMBER"
+            echo "Commit: $GITHUB_SHA"
+            echo "Ref: $GITHUB_REF"
+            echo "Runner: $RUNNER_OS"
+            echo
+            echo "## Focused build error"
+            echo
+            cat ci-error/error-log.txt
+          } > ci-error/ERROR_REPORT.md
+
+          # Keep the full raw log out of the downloadable error artifact.
+          rm -f build-output.log
+
+      - name: Add focused error to Job Summary
+        if: failure()
+        shell: bash
+        run: |
+          {
+            echo "## ❌ Orbita Aurora build failed"
+            echo
+            echo "The downloadable **orbita-aurora-error-log-${{ github.run_number }}** artifact contains the filtered error/root-cause context."
+            echo
+            echo '```text'
+            cat ci-error/error-log.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload focused error log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbita-aurora-error-log-${{ github.run_number }}
+          path: ci-error/
+          if-no-files-found: error
+          retention-days: 14

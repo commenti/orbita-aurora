@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "profiles": [
+    {
+      "id": "generic-mobile-gecko",
+      "displayName": "Generic Mobile Gecko",
+      "deviceClass": "mobile",
+      "osFamily": "Android",
+      "browserFamily": "GeckoView",
+      "userAgent": null,
+      "clientHints": null,
+      "viewport": { "width": 390, "height": 844 },
+      "supportedResolutionPresets": [
+        { "width": 360, "height": 800 },
+        { "width": 390, "height": 844 },
+        { "width": 412, "height": 915 }
+      ],
+      "devicePixelRatio": 1.0,
+      "orientation": "portrait"
+    },
+    {
+      "id": "generic-desktop-gecko",
+      "displayName": "Generic Desktop Gecko",
+      "deviceClass": "desktop",
+      "osFamily": "Desktop",
+      "browserFamily": "GeckoView",
+      "userAgent": null,
+      "clientHints": null,
+      "viewport": { "width": 1366, "height": 768 },
+      "supportedResolutionPresets": [
+        { "width": 1280, "height": 720 },
+        { "width": 1366, "height": 768 },
+        { "width": 1536, "height": 864 }
+      ],
+      "devicePixelRatio": 1.0,
+      "orientation": "landscape"
+    }
+  ]
+}

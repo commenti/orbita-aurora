@@ -1,0 +1,13 @@
+.gradle/
+/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+.idea/
+*.iml
+app/build/
+
+# Local CI diagnostics
+build-output.log
+ci-error/
