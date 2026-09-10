@@ -4,7 +4,9 @@ plugins {
 
 android {
     namespace 'com.orbita.aurora'
+
     compileSdk 37
+    compileSdkExtension 1
 
     defaultConfig {
         applicationId 'com.orbita.aurora'
