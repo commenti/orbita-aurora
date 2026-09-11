@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#11151D">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:gravity="center_vertical"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp">
+
+        <Button
+            android:id="@+id/back_button"
+            style="@android:style/Widget.Material.Button.Borderless"
+            android:layout_width="44dp"
+            android:layout_height="54dp"
+            android:text="‹"
+            android:textSize="28sp"
+            android:textColor="#FFFFFF"
+            android:contentDescription="Back" />
+
+        <Button
+            android:id="@+id/forward_button"
+            style="@android:style/Widget.Material.Button.Borderless"
+            android:layout_width="44dp"
+            android:layout_height="54dp"
+            android:text="›"
+            android:textSize="28sp"
+            android:textColor="#FFFFFF"
+            android:contentDescription="Forward" />
+
+        <EditText
+            android:id="@+id/address_bar"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_address"
+            android:hint="Search or enter address"
+            android:singleLine="true"
+            android:inputType="textUri"
+            android:imeOptions="actionGo"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#AAB2C0"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp" />
+
+        <Button
+            android:id="@+id/reload_button"
+            style="@android:style/Widget.Material.Button.Borderless"
+            android:layout_width="50dp"
+            android:layout_height="54dp"
+            android:text="↻"
+            android:textSize="24sp"
+            android:textColor="#FFFFFF"
+            android:contentDescription="Reload" />
+
+        <Button
+            android:id="@+id/menu_button"
+            style="@android:style/Widget.Material.Button.Borderless"
+            android:layout_width="48dp"
+            android:layout_height="54dp"
+            android:text="⋮"
+            android:textSize="28sp"
+            android:textColor="#FFFFFF"
+            android:contentDescription="Browser menu" />
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:fillViewport="false"
+        android:scrollbars="none"
+        android:background="#171D27">
+        <LinearLayout
+            android:id="@+id/tab_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:background="#171D27">
+        <Button
+            android:id="@+id/new_tab_button"
+            style="@android:style/Widget.Material.Button.Borderless"
+            android:layout_width="48dp"
+            android:layout_height="42dp"
+            android:text="+"
+            android:textSize="24sp"
+            android:textColor="#FFFFFF"
+            android:contentDescription="New tab" />
+        <TextView
+            android:id="@+id/status_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Orbita Aurora"
+            android:textColor="#B7C0CE"
+            android:paddingStart="8dp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/viewport_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:gravity="center">
+        <FrameLayout
+            android:id="@+id/viewport_host"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#000000">
+            <org.mozilla.geckoview.GeckoView
+                android:id="@+id/geckoview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+    </FrameLayout>
+</LinearLayout>

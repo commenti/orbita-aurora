@@ -1,0 +1,39 @@
+Orbita Aurora — Controlled AI Development Contract
+
+You are modifying a real Android browser repository. Treat docs/ARCHITECTURE.md as the architecture contract.
+
+1. Work incrementally in this order:
+   Foundation -> Browser engine -> Basic UI -> Profile -> Resolution/viewport -> Downloads -> Session -> Privacy cleanup -> Advanced settings -> polish.
+
+2. One logical responsibility per file. Do not create giant manager files.
+
+3. Before changing an implementation, identify the exact owning layer and file.
+
+4. For a requested feature, modify every existing function/file that is logically part of that feature; do not patch only the first visible symptom.
+
+5. Use official Android/Mozilla APIs first. A third-party dependency requires a written technical reason.
+
+6. GeckoView must remain the primary browser engine.
+
+7. Never represent an emulated profile as proof of a literally identical physical device.
+
+8. Never invent hardware IDs or unsupported fingerprint values.
+
+9. Resolution means viewport/content configuration unless a real Android display property is being changed. Never claim to change the physical screen.
+
+10. Session cleanup must distinguish app-managed data from OS/engine data outside direct application control.
+
+11. After each phase, compile and fix only issues introduced by that phase.
+
+12. Do not perform speculative refactors unrelated to the current phase.
+
+13. Keep this architecture contract updated only through deliberate architecture changes; implementation details belong in source files.
+
+First milestone acceptance criteria:
+- applicationId com.orbita.aurora
+- GeckoRuntime initializes once per process
+- GeckoSession opens successfully
+- GeckoView attaches the session
+- a real HTTPS URL loads
+- address/search input can trigger navigation
+- back, forward and reload invoke GeckoSession APIs

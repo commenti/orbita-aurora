@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 2,
+  "profiles": [
+    {
+      "id": "generic-mobile-gecko",
+      "displayName": "Generic Mobile Gecko",
+      "deviceClass": "mobile",
+      "osFamily": "Android",
+      "browserFamily": "GeckoView",
+      "userAgent": null,
+      "viewport": { "width": 390, "height": 844 },
+      "supportedResolutionPresets": [
+        { "width": 360, "height": 800 },
+        { "width": 390, "height": 844 },
+        { "width": 412, "height": 915 }
+      ],
+      "devicePixelRatio": 1.0,
+      "orientation": "portrait",
+      "userAgentVariants": [
+        { "id": "firefox-mobile", "displayName": "Firefox Android", "value": "Mozilla/5.0 (Android 13; Mobile; rv:128.0) Gecko/128.0 Firefox/128.0" },
+        { "id": "chrome-mobile", "displayName": "Chrome Android", "value": "Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36" },
+        { "id": "safari-mobile", "displayName": "Safari iPhone", "value": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1" }
+      ]
+    },
+    {
+      "id": "generic-desktop-gecko",
+      "displayName": "Generic Desktop Gecko",
+      "deviceClass": "desktop",
+      "osFamily": "Desktop",
+      "browserFamily": "GeckoView",
+      "userAgent": null,
+      "viewport": { "width": 1366, "height": 768 },
+      "supportedResolutionPresets": [
+        { "width": 1280, "height": 720 },
+        { "width": 1366, "height": 768 },
+        { "width": 1536, "height": 864 }
+      ],
+      "devicePixelRatio": 1.0,
+      "orientation": "landscape",
+      "userAgentVariants": [
+        { "id": "firefox-desktop", "displayName": "Firefox Desktop", "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0" },
+        { "id": "chrome-desktop", "displayName": "Chrome Desktop", "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" }
+      ]
+    }
+  ]
+}
